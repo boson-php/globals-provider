@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Boson\Component\GlobalsProvider\Tests;
 
 use Boson\Component\GlobalsProvider\DefaultServerGlobalsProvider;
-use Boson\Component\GlobalsProvider\EmptyServerGlobalsProvider;
-use Boson\Component\GlobalsProvider\StaticServerGlobalsProvider;
 use Boson\Component\Http\Request;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -39,8 +37,7 @@ final class DefaultServerGlobalsProviderTest extends TestCase
 
     public function testCreateWithCustomDelegate(): void
     {
-        $delegate = new EmptyServerGlobalsProvider();
-        $provider = new DefaultServerGlobalsProvider($delegate);
+        $provider = new DefaultServerGlobalsProvider();
 
         $globals = $provider->getServerGlobals(new Request());
 
@@ -111,22 +108,5 @@ final class DefaultServerGlobalsProviderTest extends TestCase
         self::assertSame('application/json', $globals['HTTP_CONTENT_TYPE']);
         self::assertSame('Test Browser', $globals['HTTP_USER_AGENT']);
         self::assertSame('custom value', $globals['HTTP_X_CUSTOM_HEADER']);
-    }
-
-    public function testMergeWithDelegateGlobals(): void
-    {
-        $delegate = new StaticServerGlobalsProvider([
-            'SERVER_SOFTWARE' => 'Test Server',
-            'DOCUMENT_ROOT' => '/var/www',
-        ]);
-
-        $provider = new DefaultServerGlobalsProvider($delegate);
-
-        $globals = $provider->getServerGlobals(new Request());
-
-        self::assertSame('Test Server', $globals['SERVER_SOFTWARE']);
-        self::assertSame('/var/www', $globals['DOCUMENT_ROOT']);
-        self::assertArrayHasKey('REQUEST_TIME', $globals);
-        self::assertArrayHasKey('REQUEST_METHOD', $globals);
     }
 }
